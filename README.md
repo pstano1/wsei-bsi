@@ -7,6 +7,7 @@ desc
 ```console
 git clone https://github.com/pstano1/wsei-bsi.git
 cd wsei-bsi
+go mod tidy
 go run ./cmd/
 ```
 
