@@ -23,8 +23,8 @@ func (c *CiphersController) DecipherCaesar(inputString string, shift int) string
 		index := c.searchForRune(character)
 
 		index -= shift
-		if index > 34 {
-			index -= 35
+		if index < 0 {
+			index += 35
 		}
 		output += string(c.characterSet[index])
 	}
