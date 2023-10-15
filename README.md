@@ -1,6 +1,8 @@
 ## WSEI-BSI
 
-desc
+Supported ciphers:
+- Caesar cipher
+- Polybius square
 
 #### How to run the app
 
@@ -28,3 +30,5 @@ Result: cćdeęfghijklłmnńoópqrsśtuvwxyzźżaąb
 | key | - |
 
 #### License
+
+This project is licensed under the MIT License.
