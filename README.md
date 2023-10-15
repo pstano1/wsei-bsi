@@ -14,7 +14,7 @@ go run ./cmd/
 #### Example Usage 
 
 ```console
-go run ./cmd/ --action cipher --cipher caesar --text "AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ" --key 3
+go run ./cmd/ --action code --cipher caesar --text "AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ" --key 3
 Result: cćdeęfghijklłmnńoópqrsśtuvwxyzźżaąb
 ```
 

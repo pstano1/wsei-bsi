@@ -1,6 +1,6 @@
 package ciphers
 
-func (c *CiphersController) CipherCaesar(inputString string, shift int) string {
+func (c *CiphersController) CodeCaesar(inputString string, shift int) string {
 	var output string
 
 	for _, character := range inputString {
@@ -16,7 +16,7 @@ func (c *CiphersController) CipherCaesar(inputString string, shift int) string {
 	return output
 }
 
-func (c *CiphersController) DecipherCaesar(inputString string, shift int) string {
+func (c *CiphersController) DecodeCaesar(inputString string, shift int) string {
 	var output string
 
 	for _, character := range inputString {

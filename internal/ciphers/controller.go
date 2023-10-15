@@ -5,19 +5,23 @@ import (
 )
 
 type ICiphersController interface {
-	CipherCaesar(inputString string, shift int) string
-	DecipherCaesar(inputString string, shift int) string
+	CodeCaesar(inputString string, shift int) string
+	DecodeCaesar(inputString string, shift int) string
+	CodePolybiusSquare(inputString string) string
+	DecodePolybiusSquare(inputString string) string
 }
 
 type CiphersController struct {
-	log          logrus.FieldLogger
-	characterSet []rune
+	log            logrus.FieldLogger
+	characterSet   []rune
+	polybiusSquare [][]rune
 }
 
-func NewCiphersController(log logrus.FieldLogger, characterSet []rune) ICiphersController {
+func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune) ICiphersController {
 	return &CiphersController{
-		log:          log,
-		characterSet: characterSet,
+		log:            log,
+		characterSet:   characterSet,
+		polybiusSquare: polybiusSquare,
 	}
 }
 
@@ -31,4 +35,16 @@ func (c *CiphersController) searchForRune(character rune) int {
 	}
 
 	return index
+}
+
+func (c *CiphersController) searchForRune2D(character rune, characterSet [][]rune) (int, int) {
+	for row, rowCharacters := range characterSet {
+		for index, r := range rowCharacters {
+			if r == character {
+				return row, index
+			}
+		}
+	}
+
+	return -1, -1
 }
