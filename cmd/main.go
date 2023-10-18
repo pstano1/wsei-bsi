@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/pstano1/wsei-bsi/internal/ciphers"
 	"github.com/sirupsen/logrus"
@@ -20,9 +19,9 @@ func main() {
 	polybiusSquare := [][]rune{
 		{'q', 't', 'ć', 'j', 'y', 'x', 'w'},
 		{'ą', 'd', 'e', 'f', 'k', 'ń', 'i'},
-		{'ę', 'b', 'v', 'a', 'l', 'o', 'v'},
+		{'ę', 'b', 'v', 'a', 'l', 'o', 'r'},
 		{'g', 's', 'c', 'ź', 'n', 'h', 'u'},
-		{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ź'},
+		{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ż'},
 	}
 
 	logger := logrus.New()
@@ -50,15 +49,15 @@ func main() {
 				log.Fatal("--key <key> is required for this cipher")
 			}
 			key, _ := strconv.ParseInt(*key, 10, 64)
-			input := strings.ToLower(strings.ReplaceAll(*text, " ", ""))
+			input := ciphersController.ClearInput(*text)
 			result := ciphersController.CodeCaesar(input, int(key))
 			fmt.Println("Result:", result)
 		case "polybius":
-			input := strings.ToLower(strings.ReplaceAll(*text, " ", ""))
+			input := ciphersController.ClearInput(*text)
 			result := ciphersController.CodePolybiusSquare(input)
 			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square", *cipher)
 		}
 	} else if *action == "decode" {
 		switch *cipher {
@@ -70,8 +69,7 @@ func main() {
 			result := ciphersController.DecodeCaesar(*text, int(key))
 			fmt.Println("Result:", result)
 		case "polybius":
-			input := strings.ToLower(*text)
-			result := ciphersController.DecodePolybiusSquare(input)
+			result := ciphersController.DecodePolybiusSquare(*text)
 			fmt.Println("Result:", result)
 		default:
 			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius", *cipher)

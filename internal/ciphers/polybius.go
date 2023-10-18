@@ -46,6 +46,7 @@ func (c *CiphersController) DecodePolybiusSquare(inputString string) string {
 					y = c.polybiusMapping(digit, "decode")
 				}
 			}
+
 			output += string(c.polybiusSquare[x][y])
 		}
 	}

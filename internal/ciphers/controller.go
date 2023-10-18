@@ -1,6 +1,9 @@
 package ciphers
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -9,6 +12,11 @@ type ICiphersController interface {
 	DecodeCaesar(inputString string, shift int) string
 	CodePolybiusSquare(inputString string) string
 	DecodePolybiusSquare(inputString string) string
+
+	ClearInput(input string) string
+	searchForRune(character rune, characterSet []rune) int
+	searchForRune2D(character rune, characterSet [][]rune) (int, int)
+	polybiusMapping(index int, operation string) int
 }
 
 type CiphersController struct {
@@ -25,9 +33,9 @@ func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusS
 	}
 }
 
-func (c *CiphersController) searchForRune(character rune) int {
+func (c *CiphersController) searchForRune(character rune, characterSet []rune) int {
 	index := -1
-	for i, r := range c.characterSet {
+	for i, r := range characterSet {
 		if r == character {
 			index = i
 			break
@@ -47,4 +55,16 @@ func (c *CiphersController) searchForRune2D(character rune, characterSet [][]run
 	}
 
 	return -1, -1
+}
+
+func (c *CiphersController) ClearInput(input string) string {
+	input = strings.ReplaceAll(input, " ", "")
+
+	digitRe := regexp.MustCompile("[0-9]")
+	input = digitRe.ReplaceAllString(input, "")
+
+	punctRe := regexp.MustCompile(`[[:punct:]]`)
+	input = punctRe.ReplaceAllString(input, "")
+
+	return strings.ToLower(input)
 }
