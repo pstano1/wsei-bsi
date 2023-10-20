@@ -30,6 +30,7 @@ func TestInputClearing(t *testing.T) {
 		want    string
 	}{
 		{"empty message", "", ""},
+		{"3x white space", "   ", ""},
 		{"white spaces", "abc abc", "abcabc"},
 		{"punctuation", "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~", ""},
 		{"lowercase", "ABC abc", "abcabc"},
@@ -63,6 +64,70 @@ func TestCaesarEncoding(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			res := c.CodeCaesar(test.message, test.key)
+			if res != test.want {
+				t.Errorf("got %s, want %s", res, test.want)
+			}
+		})
+	}
+}
+
+func TestCaesarDecoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		key     int
+		want    string
+	}{
+		{"empty message", "", 5, ""},
+		{"negative key", "xyuv", -3, "źżxy"},
+		{"key of 0", "ąćę", 0, "ąćę"},
+		{"whole charset by 3", "cćdeęfghijklłmnńoópqrsśtuvwxyzźżaąb", 3, "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"},
+		{"whole charset by 35", "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż", 35, "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res := c.DecodeCaesar(test.message, test.key)
+			if res != test.want {
+				t.Errorf("got %s, want %s", res, test.want)
+			}
+		})
+	}
+}
+
+func TestPolybiusCoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		want    string
+	}{
+		{"empty message", "", ""},
+		{"message: test", "test", "144 529 1764 144 "},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res := c.CodePolybiusSquare(test.message)
+			if res != test.want {
+				t.Errorf("got %s, want %s", res, test.want)
+			}
+		})
+	}
+}
+
+func TestPolybiusDecoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		want    string
+	}{
+		{"empty message", "", ""},
+		{"message: test", "144 529 1764 144", "test"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			res := c.DecodePolybiusSquare(test.message)
 			if res != test.want {
 				t.Errorf("got %s, want %s", res, test.want)
 			}
