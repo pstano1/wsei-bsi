@@ -19,9 +19,47 @@ var polybiusSquare = [][]rune{
 	{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ź'},
 }
 
+var bealeMap = map[rune][]rune{
+	'a': {'e', '2', '3', 'j', '^', '$', '&', '0', ')'},
+	'ą': {'f'},
+	'b': {'g'},
+	'c': {'h', '8', '9', 'm'},
+	'ć': {'i'},
+	'd': {'j', '0', '!'},
+	'e': {'k', '1', '@', 'p', '-', '+', '.', '6'},
+	'ę': {'l'},
+	'f': {'m'},
+	'g': {'n'},
+	'h': {'o'},
+	'i': {'p', '6', '&', 'u', '(', ')', '-', '1'},
+	'j': {'q', '7'},
+	'k': {'r', '8', '(', 'w'},
+	'l': {'s', '9'},
+	'ł': {'t', '0'},
+	'm': {'u', '!', '+'},
+	'n': {'v', '@', ',', 'ź', ',', '<'},
+	'ń': {'o'},
+	'o': {'x', '=', '|', ';', '9', ';'},
+	'ó': {'y'},
+	'p': {'z', '^', '\\'},
+	'q': {'ź'},
+	'r': {'ż', '*', '?', 'ć', '?'},
+	's': {'d', '(', '<', 'd'},
+	'ś': {'f'},
+	't': {'g', '*', '?', 'ę'},
+	'u': {'h', '+', '!'},
+	'v': {'i'},
+	'w': {'j', '-', '#', 'h', '*', '('},
+	'x': {'k'},
+	'y': {'l', '/', '%', 'j'},
+	'z': {'m', '0', '^', 'k', '*', '+'},
+	'ź': {'n'},
+	'ż': {'o', '2', '`', 'ł'},
+}
+
 var logger = logrus.New()
 
-var c = NewCiphersController(logger, characters, polybiusSquare)
+var c = NewCiphersController(logger, characters, polybiusSquare, bealeMap)
 
 func TestInputClearing(t *testing.T) {
 	var tests = []struct {
@@ -132,5 +170,26 @@ func TestPolybiusDecoding(t *testing.T) {
 				t.Errorf("got %s, want %s", res, test.want)
 			}
 		})
+	}
+}
+
+func TestBealeCoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+	}{
+		{"empty message", ""},
+		{"word: test", "test"},
+		{"whole charset", "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"},
+	}
+
+	for _, test := range tests {
+		output := c.CodeBeale(test.message)
+		if len(output) != len(test.message) {
+			t.Errorf("Input: %s - Output: %s - Expected length: %d - Got: %d", test.message, output, len(test.message), len(output))
+		}
+		if len(output) == 0 && len(test.message) != 0 {
+			t.Errorf("Input: %s - Output is empty", test.message)
+		}
 	}
 }

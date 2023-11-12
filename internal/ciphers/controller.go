@@ -12,6 +12,10 @@ type ICiphersController interface {
 	DecodeCaesar(inputString string, shift int) string
 	CodePolybiusSquare(inputString string) string
 	DecodePolybiusSquare(inputString string) string
+	CodeBeale(inputString string) string
+	DecodeBeale(inputString string) string
+	CodeTrithemius(inputString string, key rune) string
+	DecodeTrithemius(inputString string, key rune) string
 
 	ClearInput(input string) string
 	searchForRune(character rune, characterSet []rune) int
@@ -23,13 +27,15 @@ type CiphersController struct {
 	log            logrus.FieldLogger
 	characterSet   []rune
 	polybiusSquare [][]rune
+	bealeMap       map[rune][]rune
 }
 
-func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune) ICiphersController {
+func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, bealeMap map[rune][]rune) ICiphersController {
 	return &CiphersController{
 		log:            log,
 		characterSet:   characterSet,
 		polybiusSquare: polybiusSquare,
+		bealeMap:       bealeMap,
 	}
 }
 

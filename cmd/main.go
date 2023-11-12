@@ -24,9 +24,47 @@ func main() {
 		{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ż'},
 	}
 
+	bealeMap := map[rune][]rune{
+		'a': {'e', '❤', '♫', 'x', ':', '&', '0', '☺'},
+		'ą': {'f'},
+		'b': {'§'},
+		'c': {'h', '8', '9', 'm'},
+		'ć': {'i'},
+		'd': {'k', '1', '@', 'p', '-', '!', '.'},
+		'e': {'☀'},
+		'ę': {'>'},
+		'f': {'n'},
+		'g': {'o'},
+		'h': {'q'},
+		'i': {'r', '7'},
+		'j': {'s', '♦'},
+		'k': {'t', '}'},
+		'l': {'u', '^'},
+		'ł': {'\'', '{', ',', 'ź', '<'},
+		'm': {'ń'},
+		'n': {'ó', '=', '|', ';', '8'},
+		'ń': {'ż'},
+		'o': {'#'},
+		'ó': {'~'},
+		'p': {'♣', '\\', '♥'},
+		'q': {'*'},
+		'r': {'ś', '?'},
+		's': {'z', '_'},
+		'ś': {'$', 'y'},
+		't': {'★', '☼'},
+		'u': {'4', '+', '!'},
+		'v': {'¶'},
+		'w': {'/', 'd'},
+		'x': {')'},
+		'y': {'¢', '2', '©', 'ę'},
+		'z': {'g', '5', 'v', '(', 'f'},
+		'ź': {'%'},
+		'ż': {'6'},
+	}
+
 	logger := logrus.New()
 
-	ciphersController := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), characters, polybiusSquare)
+	ciphersController := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), characters, polybiusSquare, bealeMap)
 
 	action := flag.String("action", "", "Action (code or decode)")
 	cipher := flag.String("cipher", "", "Cipher name")
@@ -56,8 +94,24 @@ func main() {
 			input := ciphersController.ClearInput(*text)
 			result := ciphersController.CodePolybiusSquare(input)
 			fmt.Println("Result:", result)
+		case "beale":
+			input := ciphersController.ClearInput(*text)
+			result := ciphersController.CodeBeale(input)
+			fmt.Println("Result:", result)
+		case "trithemius":
+			key := ciphersController.ClearInput(*key)
+			if key == "" {
+				log.Fatal("--key <key> is required for this cipher")
+			}
+			keyRune := []rune(key)
+			if len(keyRune) != 1 {
+				log.Fatal("Please provide a valid key")
+			}
+			input := ciphersController.ClearInput(*text)
+			result := ciphersController.CodeTrithemius(input, keyRune[0])
+			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square, beale, trithemius", *cipher)
 		}
 	} else if *action == "decode" {
 		switch *cipher {
@@ -71,8 +125,20 @@ func main() {
 		case "polybius":
 			result := ciphersController.DecodePolybiusSquare(*text)
 			fmt.Println("Result:", result)
+		case "beale":
+			result := ciphersController.DecodeBeale(*text)
+			fmt.Println("Result:", result)
+		case "trithemius":
+			key := ciphersController.ClearInput(*key)
+			if key == "" {
+				log.Fatal("--key <key> is required for this cipher")
+			}
+			keyRune := []rune(key)
+			input := ciphersController.ClearInput(*text)
+			result := ciphersController.DecodeTrithemius(input, keyRune[0])
+			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius, beale, trithemius", *cipher)
 		}
 	}
 }
