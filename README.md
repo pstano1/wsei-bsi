@@ -1,17 +1,17 @@
 ## WSEI-BSI
 
-This repository cotains a CLI implementing some od most known cipher used in the past.
+This repository houses a Command-Line Interface (CLI) that implements various historical ciphers. These ciphers were used in the past for secure communication and encryption.
 
 Supported ciphers:
 - Caesar cipher
 - Polybius square
-- Beale cipher
+- Homophonic cipher
 - Trithemius cipher (tabula recta)
 - Vigenère cipher
 
-TO-DO:
-- [ ] make a JSON config file for maps & character sets
-- [ ] add comments abotu each cipher and it's modification if one's been done 
+### config.json
+
+Please note that `config.json` may contain sensitive information, and for production scenarios, it's recommended to secure this file and avoid public exposure. However, in the context of this educational project, I've included it for instructional purposes and as a reference example.
 
 ### How to run the app
 
@@ -48,17 +48,17 @@ Result: cćdeęfghijklłmnńoópqrsśtuvwxyzźżaąb
 
 ##### Symmetric Ciphers
 
-- `caesar`: Caesar cipher
+- `caesar`
 
-- `polybius`: Polybius square
+- `polybius`
 
-- `beale`: Beale cipher
+- `homophonic`
 
 ##### Substitution Ciphers
 
-- `trithemius`: Trithemius cipher (tabula recta)
+- `trithemius`
 
-- `vigenere`: Vigenère cipher
+- `vigenere`
 
 ### License
 

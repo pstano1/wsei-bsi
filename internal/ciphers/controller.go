@@ -13,8 +13,8 @@ type ICiphersController interface {
 	DecodeCaesar(inputString string, shift int) string
 	CodePolybiusSquare(inputString string) string
 	DecodePolybiusSquare(inputString string) string
-	CodeBeale(inputString string) string
-	DecodeBeale(inputString string) string
+	CodeHomophonic(inputString string) string
+	DecodeHomophonic(inputString string) string
 	CodeTrithemius(inputString string, key rune) string
 	DecodeTrithemius(inputString string, key rune) string
 	CodeVigenere(inputString string, key string) string
@@ -30,19 +30,19 @@ type CiphersController struct {
 	log            logrus.FieldLogger
 	characterSet   []rune
 	polybiusSquare [][]rune
-	bealeMap       map[rune][]rune
+	homophonicMap  map[rune][]rune
 }
 
-func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, bealeMap map[rune][]rune) (ICiphersController, error) {
-	if hasDuplicate := checkBealeMapForDuplicates(bealeMap); hasDuplicate != false {
-		return nil, errors.New("beale map has duplicates")
+func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, homophonicMap map[rune][]rune) (ICiphersController, error) {
+	if hasDuplicate := checkHomophonicMapForDuplicates(homophonicMap); hasDuplicate != false {
+		return nil, errors.New("rune map for homophonic cipher has duplicates")
 	}
 
 	return &CiphersController{
 		log:            log,
 		characterSet:   characterSet,
 		polybiusSquare: polybiusSquare,
-		bealeMap:       bealeMap,
+		homophonicMap:  homophonicMap,
 	}, nil
 }
 
@@ -82,10 +82,10 @@ func (c *CiphersController) ClearInput(input string) string {
 	return strings.ToLower(input)
 }
 
-func checkBealeMapForDuplicates(bealeMap map[rune][]rune) bool {
+func checkHomophonicMapForDuplicates(homophonicMap map[rune][]rune) bool {
 	seenValues := make(map[rune]struct{})
 
-	for _, values := range bealeMap {
+	for _, values := range homophonicMap {
 		for _, value := range values {
 			if _, exists := seenValues[value]; exists {
 				return true

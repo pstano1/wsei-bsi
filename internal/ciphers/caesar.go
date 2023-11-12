@@ -1,3 +1,5 @@
+// Caesar cipher is a substitution cipher where each letter in the plaintext
+// is shifted a certain number of places down or up the alphabet.
 package ciphers
 
 func (c *CiphersController) CodeCaesar(inputString string, shift int) string {

@@ -1,66 +1,52 @@
 package ciphers
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/pstano1/wsei-bsi/internal/ciphers"
+	"github.com/pstano1/wsei-bsi/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
-var characters = []rune{
-	'a', 'ą', 'b', 'c', 'ć', 'd', 'e', 'ę', 'f', 'g', 'h', 'i', 'j', 'k',
-	'l', 'ł', 'm', 'n', 'ń', 'o', 'ó', 'p', 'q', 'r', 's', 'ś', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ź', 'ż',
+var (
+	c      ciphers.ICiphersController
+	logger *logrus.Logger
+)
+
+func TestMain(m *testing.M) {
+	file, err := os.Open("../config.json")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	jsonData, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Println("Error reading JSON file:", err)
+		return
+	}
+
+	var auxKeys utils.AuxConfig
+
+	err = json.Unmarshal(jsonData, &auxKeys)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
+	}
+
+	characters := utils.ConvertStringsToRunes(auxKeys.Characters)
+	polybiusSquare := utils.ConvertStringSlicesToRuneSlices(auxKeys.PolybiusSquare)
+	homophonicMap := utils.ConvertStringMapToRuneMap(auxKeys.HomophonicMap)
+
+	c, _ = ciphers.NewCiphersController(logger, characters, polybiusSquare, homophonicMap)
+
+	m.Run()
 }
-
-var polybiusSquare = [][]rune{
-	{'q', 't', 'ć', 'j', 'y', 'x', 'w'},
-	{'ą', 'd', 'e', 'f', 'k', 'ń', 'i'},
-	{'ę', 'b', 'v', 'a', 'l', 'o', 'v'},
-	{'g', 's', 'c', 'ź', 'n', 'h', 'u'},
-	{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ź'},
-}
-
-var bealeMap = map[rune][]rune{
-	'a': {'e', '❤', '♫', 'x', ':', '&', '0', '☺'},
-	'ą': {'f'},
-	'b': {'§'},
-	'c': {'h', 'ä', '9', 'm'},
-	'ć': {'i'},
-	'd': {'k', '1', '@', 'p', '-', 'ü', '.'},
-	'e': {'☀'},
-	'ę': {'>'},
-	'f': {'n'},
-	'g': {'o'},
-	'h': {'q'},
-	'i': {'r', '7'},
-	'j': {'s', '♦'},
-	'k': {'t', '}'},
-	'l': {'u', '^'},
-	'ł': {'\'', '{', ',', 'ź', '<'},
-	'm': {'ń'},
-	'n': {'ó', '=', '|', ';', '8'},
-	'ń': {'ż'},
-	'o': {'#'},
-	'ó': {'~'},
-	'p': {'♣', '\\', '♥'},
-	'q': {'*'},
-	'r': {'ś', '?'},
-	's': {'z', '_'},
-	'ś': {'$', 'y'},
-	't': {'★', '☼'},
-	'u': {'4', '+', '!'},
-	'v': {'¶'},
-	'w': {'/', 'd'},
-	'x': {')'},
-	'y': {'¢', '2', '©', 'ę'},
-	'z': {'g', '5', 'v', '(', 'ö'},
-	'ź': {'%'},
-	'ż': {'6'},
-}
-
-var logger = logrus.New()
-
-var c, _ = ciphers.NewCiphersController(logger, characters, polybiusSquare, bealeMap)
 
 func TestInputClearing(t *testing.T) {
 	var tests = []struct {
@@ -174,7 +160,7 @@ func TestPolybiusDecoding(t *testing.T) {
 	}
 }
 
-func TestBealeCoding(t *testing.T) {
+func TestHomophonicCoding(t *testing.T) {
 	var tests = []struct {
 		name    string
 		message string
@@ -186,7 +172,7 @@ func TestBealeCoding(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := c.CodeBeale(test.message)
+			output := c.CodeHomophonic(test.message)
 			runes := []rune(output)
 			originalRunes := []rune(test.message)
 			if len(runes) != len(originalRunes) {
@@ -199,7 +185,7 @@ func TestBealeCoding(t *testing.T) {
 	}
 }
 
-func TestBealeDecoding(t *testing.T) {
+func TestHomophonicDecoding(t *testing.T) {
 	var tests = []struct {
 		name           string
 		message        string
@@ -214,7 +200,7 @@ func TestBealeDecoding(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := c.DecodeBeale(test.message)
+			output := c.DecodeHomophonic(test.message)
 			if output != test.expectedOutput {
 				t.Errorf("got %s, want: %s", output, test.expectedOutput)
 			}

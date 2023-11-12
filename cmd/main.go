@@ -1,70 +1,49 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/pstano1/wsei-bsi/internal/ciphers"
+	"github.com/pstano1/wsei-bsi/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	characters := []rune{
-		'a', 'ą', 'b', 'c', 'ć', 'd', 'e', 'ę', 'f', 'g', 'h', 'i', 'j', 'k',
-		'l', 'ł', 'm', 'n', 'ń', 'o', 'ó', 'p', 'q', 'r', 's', 'ś', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ź', 'ż',
+	file, err := os.Open("config.json")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	jsonData, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Println("Error reading JSON file:", err)
+		return
 	}
 
-	polybiusSquare := [][]rune{
-		{'q', 't', 'ć', 'j', 'y', 'x', 'w'},
-		{'ą', 'd', 'e', 'f', 'k', 'ń', 'i'},
-		{'ę', 'b', 'v', 'a', 'l', 'o', 'r'},
-		{'g', 's', 'c', 'ź', 'n', 'h', 'u'},
-		{'ś', 'p', 'ó', 'ł', 'm', 'z', 'ż'},
+	var keys utils.Config
+	var auxKeys utils.AuxConfig
+
+	err = json.Unmarshal(jsonData, &auxKeys)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
 	}
 
-	bealeMap := map[rune][]rune{
-		'a': {'e', '❤', '♫', 'x', ':', '&', '0', '☺'},
-		'ą': {'f'},
-		'b': {'§'},
-		'c': {'h', 'ä', '9', 'm'},
-		'ć': {'i'},
-		'd': {'k', '1', '@', 'p', '-', 'ü', '.'},
-		'e': {'☀'},
-		'ę': {'>'},
-		'f': {'n'},
-		'g': {'o'},
-		'h': {'q'},
-		'i': {'r', '7'},
-		'j': {'s', '♦'},
-		'k': {'t', '}'},
-		'l': {'u', '^'},
-		'ł': {'\'', '{', ',', 'ź', '<'},
-		'm': {'ń'},
-		'n': {'ó', '=', '|', ';', '8'},
-		'ń': {'ż'},
-		'o': {'#'},
-		'ó': {'~'},
-		'p': {'♣', '\\', '♥'},
-		'q': {'*'},
-		'r': {'ś', '?'},
-		's': {'z', '_'},
-		'ś': {'$', 'y'},
-		't': {'★', '☼'},
-		'u': {'4', '+', '!'},
-		'v': {'¶'},
-		'w': {'/', 'd'},
-		'x': {')'},
-		'y': {'¢', '2', '©', 'ę'},
-		'z': {'g', '5', 'v', '(', 'ö'},
-		'ź': {'%'},
-		'ż': {'6'},
-	}
+	keys.Characters = utils.ConvertStringsToRunes(auxKeys.Characters)
+	keys.HomophonicMap = utils.ConvertStringMapToRuneMap(auxKeys.HomophonicMap)
+	keys.PolybiusSquare = utils.ConvertStringSlicesToRuneSlices(auxKeys.PolybiusSquare)
 
 	logger := logrus.New()
 
-	ciphersController, err := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), characters, polybiusSquare, bealeMap)
+	ciphersController, err := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), keys.Characters, keys.PolybiusSquare, keys.HomophonicMap)
 	if err != nil {
 		panic("beale map contains duplicates, aborting")
 	}
@@ -97,9 +76,9 @@ func main() {
 			input := ciphersController.ClearInput(*text)
 			result := ciphersController.CodePolybiusSquare(input)
 			fmt.Println("Result:", result)
-		case "beale":
+		case "homophonic":
 			input := ciphersController.ClearInput(*text)
-			result := ciphersController.CodeBeale(input)
+			result := ciphersController.CodeHomophonic(input)
 			fmt.Println("Result:", result)
 		case "trithemius":
 			key := ciphersController.ClearInput(*key)
@@ -122,7 +101,7 @@ func main() {
 			result := ciphersController.CodeVigenere(input, key)
 			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square, beale, trithemius & vigenere", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square, homophonic, trithemius & vigenere", *cipher)
 		}
 	} else if *action == "decode" {
 		switch *cipher {
@@ -136,8 +115,8 @@ func main() {
 		case "polybius":
 			result := ciphersController.DecodePolybiusSquare(*text)
 			fmt.Println("Result:", result)
-		case "beale":
-			result := ciphersController.DecodeBeale(*text)
+		case "homophonic":
+			result := ciphersController.DecodeHomophonic(*text)
 			fmt.Println("Result:", result)
 		case "trithemius":
 			key := ciphersController.ClearInput(*key)
@@ -157,7 +136,7 @@ func main() {
 			result := ciphersController.DecodeVigenere(input, key)
 			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius, beale, trithemius & vigenere", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius, homophonic, trithemius & vigenere", *cipher)
 		}
 	}
 }

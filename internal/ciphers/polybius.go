@@ -1,3 +1,7 @@
+// The Polybius Square cipher is a substitution cipher that represents each letter
+// with a pair of coordinates in a grid. The encoding process involves mapping each
+// character to its corresponding coordinates and converting them to a numeric value.
+// This implementation also performs some math calcutaions to make it harder for analysis.
 package ciphers
 
 import (

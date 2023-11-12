@@ -1,3 +1,6 @@
+// The Vigenere cipher is a method of encrypting alphabetic text by using a simple form
+// of polyalphabetic substitution. The key is repeated to match the length of the plaintext,
+// and each letter is shifted according to the corresponding letter in the key.
 package ciphers
 
 func (c *CiphersController) CodeVigenere(inputString string, key string) string {

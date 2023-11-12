@@ -1,3 +1,6 @@
+// The Trithemius cipher is a simple substitution cipher where each letter
+// is shifted by a progressively increasing value based on the position in the text.
+// This implemenation featrues a key of a single rune that is then convereted to starting point.
 package ciphers
 
 func (c *CiphersController) CodeTrithemius(inputString string, key rune) string {
