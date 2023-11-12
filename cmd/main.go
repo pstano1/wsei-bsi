@@ -110,8 +110,16 @@ func main() {
 			input := ciphersController.ClearInput(*text)
 			result := ciphersController.CodeTrithemius(input, keyRune[0])
 			fmt.Println("Result:", result)
+		case "vigenere":
+			key := ciphersController.ClearInput(*key)
+			if key == "" {
+				log.Fatal("--key <key> is required for this cipher")
+			}
+			input := ciphersController.ClearInput(*text)
+			result := ciphersController.CodeVigenere(input, key)
+			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square, beale, trithemius", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius square, beale, trithemius & vigenere", *cipher)
 		}
 	} else if *action == "decode" {
 		switch *cipher {
@@ -137,8 +145,16 @@ func main() {
 			input := ciphersController.ClearInput(*text)
 			result := ciphersController.DecodeTrithemius(input, keyRune[0])
 			fmt.Println("Result:", result)
+		case "vigenere":
+			key := ciphersController.ClearInput(*key)
+			if key == "" {
+				log.Fatal("--key <key> is required for this cipher")
+			}
+			input := ciphersController.ClearInput(*text)
+			result := ciphersController.DecodeVigenere(input, key)
+			fmt.Println("Result:", result)
 		default:
-			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius, beale, trithemius", *cipher)
+			log.Fatalf("Invalid cipher name %s. Supported ciphers: cesear, polybius, beale, trithemius & vigenere", *cipher)
 		}
 	}
 }

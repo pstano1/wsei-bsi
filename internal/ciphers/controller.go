@@ -16,6 +16,8 @@ type ICiphersController interface {
 	DecodeBeale(inputString string) string
 	CodeTrithemius(inputString string, key rune) string
 	DecodeTrithemius(inputString string, key rune) string
+	CodeVigenere(inputString string, key string) string
+	DecodeVigenere(inputString string, key string) string
 
 	ClearInput(input string) string
 	searchForRune(character rune, characterSet []rune) int
