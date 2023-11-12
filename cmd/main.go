@@ -28,9 +28,9 @@ func main() {
 		'a': {'e', '❤', '♫', 'x', ':', '&', '0', '☺'},
 		'ą': {'f'},
 		'b': {'§'},
-		'c': {'h', '8', '9', 'm'},
+		'c': {'h', 'ä', '9', 'm'},
 		'ć': {'i'},
-		'd': {'k', '1', '@', 'p', '-', '!', '.'},
+		'd': {'k', '1', '@', 'p', '-', 'ü', '.'},
 		'e': {'☀'},
 		'ę': {'>'},
 		'f': {'n'},
@@ -57,14 +57,17 @@ func main() {
 		'w': {'/', 'd'},
 		'x': {')'},
 		'y': {'¢', '2', '©', 'ę'},
-		'z': {'g', '5', 'v', '(', 'f'},
+		'z': {'g', '5', 'v', '(', 'ö'},
 		'ź': {'%'},
 		'ż': {'6'},
 	}
 
 	logger := logrus.New()
 
-	ciphersController := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), characters, polybiusSquare, bealeMap)
+	ciphersController, err := ciphers.NewCiphersController(logger.WithField("component", "ciphers"), characters, polybiusSquare, bealeMap)
+	if err != nil {
+		panic("beale map contains duplicates, aborting")
+	}
 
 	action := flag.String("action", "", "Action (code or decode)")
 	cipher := flag.String("cipher", "", "Cipher name")

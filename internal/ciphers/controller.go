@@ -1,6 +1,7 @@
 package ciphers
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 
@@ -32,13 +33,17 @@ type CiphersController struct {
 	bealeMap       map[rune][]rune
 }
 
-func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, bealeMap map[rune][]rune) ICiphersController {
+func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, bealeMap map[rune][]rune) (ICiphersController, error) {
+	if hasDuplicate := checkBealeMapForDuplicates(bealeMap); hasDuplicate != false {
+		return nil, errors.New("beale map has duplicates")
+	}
+
 	return &CiphersController{
 		log:            log,
 		characterSet:   characterSet,
 		polybiusSquare: polybiusSquare,
 		bealeMap:       bealeMap,
-	}
+	}, nil
 }
 
 func (c *CiphersController) searchForRune(character rune, characterSet []rune) int {
@@ -75,4 +80,19 @@ func (c *CiphersController) ClearInput(input string) string {
 	input = punctRe.ReplaceAllString(input, "")
 
 	return strings.ToLower(input)
+}
+
+func checkBealeMapForDuplicates(bealeMap map[rune][]rune) bool {
+	seenValues := make(map[rune]struct{})
+
+	for _, values := range bealeMap {
+		for _, value := range values {
+			if _, exists := seenValues[value]; exists {
+				return true
+			}
+			seenValues[value] = struct{}{}
+		}
+	}
+
+	return false
 }

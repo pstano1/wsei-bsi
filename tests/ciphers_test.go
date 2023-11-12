@@ -3,6 +3,7 @@ package ciphers
 import (
 	"testing"
 
+	"github.com/pstano1/wsei-bsi/internal/ciphers"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,46 +21,46 @@ var polybiusSquare = [][]rune{
 }
 
 var bealeMap = map[rune][]rune{
-	'a': {'e', '2', '3', 'j', '^', '$', '&', '0', ')'},
+	'a': {'e', '❤', '♫', 'x', ':', '&', '0', '☺'},
 	'ą': {'f'},
-	'b': {'g'},
-	'c': {'h', '8', '9', 'm'},
+	'b': {'§'},
+	'c': {'h', 'ä', '9', 'm'},
 	'ć': {'i'},
-	'd': {'j', '0', '!'},
-	'e': {'k', '1', '@', 'p', '-', '+', '.', '6'},
-	'ę': {'l'},
-	'f': {'m'},
-	'g': {'n'},
-	'h': {'o'},
-	'i': {'p', '6', '&', 'u', '(', ')', '-', '1'},
-	'j': {'q', '7'},
-	'k': {'r', '8', '(', 'w'},
-	'l': {'s', '9'},
-	'ł': {'t', '0'},
-	'm': {'u', '!', '+'},
-	'n': {'v', '@', ',', 'ź', ',', '<'},
-	'ń': {'o'},
-	'o': {'x', '=', '|', ';', '9', ';'},
-	'ó': {'y'},
-	'p': {'z', '^', '\\'},
-	'q': {'ź'},
-	'r': {'ż', '*', '?', 'ć', '?'},
-	's': {'d', '(', '<', 'd'},
-	'ś': {'f'},
-	't': {'g', '*', '?', 'ę'},
-	'u': {'h', '+', '!'},
-	'v': {'i'},
-	'w': {'j', '-', '#', 'h', '*', '('},
-	'x': {'k'},
-	'y': {'l', '/', '%', 'j'},
-	'z': {'m', '0', '^', 'k', '*', '+'},
-	'ź': {'n'},
-	'ż': {'o', '2', '`', 'ł'},
+	'd': {'k', '1', '@', 'p', '-', 'ü', '.'},
+	'e': {'☀'},
+	'ę': {'>'},
+	'f': {'n'},
+	'g': {'o'},
+	'h': {'q'},
+	'i': {'r', '7'},
+	'j': {'s', '♦'},
+	'k': {'t', '}'},
+	'l': {'u', '^'},
+	'ł': {'\'', '{', ',', 'ź', '<'},
+	'm': {'ń'},
+	'n': {'ó', '=', '|', ';', '8'},
+	'ń': {'ż'},
+	'o': {'#'},
+	'ó': {'~'},
+	'p': {'♣', '\\', '♥'},
+	'q': {'*'},
+	'r': {'ś', '?'},
+	's': {'z', '_'},
+	'ś': {'$', 'y'},
+	't': {'★', '☼'},
+	'u': {'4', '+', '!'},
+	'v': {'¶'},
+	'w': {'/', 'd'},
+	'x': {')'},
+	'y': {'¢', '2', '©', 'ę'},
+	'z': {'g', '5', 'v', '(', 'ö'},
+	'ź': {'%'},
+	'ż': {'6'},
 }
 
 var logger = logrus.New()
 
-var c = NewCiphersController(logger, characters, polybiusSquare, bealeMap)
+var c, _ = ciphers.NewCiphersController(logger, characters, polybiusSquare, bealeMap)
 
 func TestInputClearing(t *testing.T) {
 	var tests = []struct {
@@ -184,12 +185,129 @@ func TestBealeCoding(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := c.CodeBeale(test.message)
-		if len(output) != len(test.message) {
-			t.Errorf("Input: %s - Output: %s - Expected length: %d - Got: %d", test.message, output, len(test.message), len(output))
-		}
-		if len(output) == 0 && len(test.message) != 0 {
-			t.Errorf("Input: %s - Output is empty", test.message)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			output := c.CodeBeale(test.message)
+			runes := []rune(output)
+			originalRunes := []rune(test.message)
+			if len(runes) != len(originalRunes) {
+				t.Errorf("Input: %s - Output: %s - Expected length: %d - Got: %d", test.message, output, len(originalRunes), len(runes))
+			}
+			if len(runes) == 0 && len(originalRunes) != 0 {
+				t.Errorf("Input: %s - Output is empty", test.message)
+			}
+		})
+	}
+}
+
+func TestBealeDecoding(t *testing.T) {
+	var tests = []struct {
+		name           string
+		message        string
+		expectedOutput string
+	}{
+		{"empty message", "", ""},
+		{"word: test", "☼☀_☼", "test"},
+		{"word test #2", "☼☀_★", "test"},
+		{"whole charset", ":f§mi1☀>noqr♦}u'ńóż#~\\*śzy☼4¶d)25%6", "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"},
+		{"whole charset #2", "0f§äi.☀>noq7♦tu'ń;ż#~♥*ś_$★!¶d)2v%6", "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := c.DecodeBeale(test.message)
+			if output != test.expectedOutput {
+				t.Errorf("got %s, want: %s", output, test.expectedOutput)
+			}
+		})
+	}
+}
+
+func TestTrithemiusCoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		key     rune
+		want    string
+	}{
+		{"empty message", "", 'a', ""},
+		{"key of \"A\" => first shift is 0", "abc", 'a', "acd"},
+		{"non-empty message with first shift of 3", "hello", 'c', "khoót"},
+		{"message with diacritics with first shift of 5", "ąbcć", 'd', "efhj"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := c.CodeTrithemius(test.message, test.key)
+			if output != test.want {
+				t.Errorf("got %s, want %s", output, test.want)
+			}
+		})
+	}
+}
+
+func TestTrithemiusDecoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		key     rune
+		want    string
+	}{
+		{"empty message", "", 'a', ""},
+		{"key of \"A\" => first shift is 0", "acd", 'a', "abc"},
+		{"non-empty message with first shift of 3", "khoót", 'c', "hello"},
+		{"message with diacritics with first shift of 5", "efhj", 'd', "ąbcć"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := c.DecodeTrithemius(test.message, test.key)
+			if output != test.want {
+				t.Errorf("got %s, want %s", output, test.want)
+			}
+		})
+	}
+}
+
+func TestVigenereCoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		key     string
+		want    string
+	}{
+		{"empty message", "", "key", ""},
+		{"non-empty message", "hello", "abc", "hfnlp"},
+		{"message with diacritics", "ąbcć", "def", "ąijł"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := c.CodeVigenere(test.message, test.key)
+			if output != test.want {
+				t.Errorf("got %s, want %s", output, test.want)
+			}
+		})
+	}
+}
+
+func TestVigenereDecoding(t *testing.T) {
+	var tests = []struct {
+		name    string
+		message string
+		key     string
+		want    string
+	}{
+		{"empty message", "", "key", ""},
+		{"non-empty message", "hfnlp", "abc", "hello"},
+		{"message with diacritics", "ąijł", "def", "ąbcć"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := c.DecodeVigenere(test.message, test.key)
+			if output != test.want {
+				t.Errorf("got %s, want %s", output, test.want)
+			}
+		})
 	}
 }

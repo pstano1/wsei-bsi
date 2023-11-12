@@ -7,9 +7,9 @@ import (
 
 func (c *CiphersController) CodeBeale(inputString string) string {
 	var output string
+	rand.Seed(time.Now().UnixNano())
 
 	for _, character := range inputString {
-		rand.Seed(time.Now().UnixNano())
 		index := rand.Intn(len(c.bealeMap[character]))
 
 		output += string(c.bealeMap[character][index])
