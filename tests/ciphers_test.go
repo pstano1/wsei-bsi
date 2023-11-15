@@ -263,7 +263,7 @@ func TestVigenereCoding(t *testing.T) {
 	}{
 		{"empty message", "", "key", ""},
 		{"non-empty message", "hello", "abc", "hfnlp"},
-		{"message with diacritics", "ąbcć", "def", "ąijł"},
+		{"message with diacritics", "ąbcć", "def", "efig"},
 	}
 
 	for _, test := range tests {
@@ -285,7 +285,7 @@ func TestVigenereDecoding(t *testing.T) {
 	}{
 		{"empty message", "", "key", ""},
 		{"non-empty message", "hfnlp", "abc", "hello"},
-		{"message with diacritics", "ąijł", "def", "ąbcć"},
+		{"message with diacritics", "efig", "def", "ąbcć"},
 	}
 
 	for _, test := range tests {

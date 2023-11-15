@@ -29,6 +29,9 @@ func (c *CiphersController) CodePolybiusSquare(inputString string) string {
 func (c *CiphersController) DecodePolybiusSquare(inputString string) string {
 	var output string
 	elements := strings.Split(inputString, " ")
+	if len(strings.TrimSpace(inputString)) == 0 {
+		return ""
+	}
 
 	for _, substr := range elements {
 		number, err := strconv.Atoi(substr)
