@@ -10,7 +10,7 @@ func (c *CiphersController) CodeCaesar(inputString string, shift int) string {
 
 		index += shift
 		if index > 34 {
-			index -= 35
+			index -= len(c.characterSet)
 		}
 		output += string(c.characterSet[index])
 	}
@@ -26,7 +26,7 @@ func (c *CiphersController) DecodeCaesar(inputString string, shift int) string {
 
 		index -= shift
 		if index < 0 {
-			index += 35
+			index += len(c.characterSet)
 		}
 		output += string(c.characterSet[index])
 	}

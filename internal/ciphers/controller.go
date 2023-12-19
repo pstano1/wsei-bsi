@@ -34,7 +34,7 @@ type CiphersController struct {
 }
 
 func NewCiphersController(log logrus.FieldLogger, characterSet []rune, polybiusSquare [][]rune, homophonicMap map[rune][]rune) (ICiphersController, error) {
-	if hasDuplicate := checkHomophonicMapForDuplicates(homophonicMap); hasDuplicate != false {
+	if hasDuplicate := checkHomophonicMapForDuplicates(homophonicMap); !hasDuplicate {
 		return nil, errors.New("rune map for homophonic cipher has duplicates")
 	}
 
